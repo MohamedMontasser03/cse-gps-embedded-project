@@ -42,5 +42,37 @@ void Uart5_init(void){													// PE Rx -> 4 ; Tx -> 5
 	GPIO_PORTE_DEN_R |= (1 << 4) | (1 << 5);							// Enable digital pins PE4-PE5   0011 0000
 	GPIO_PORTE_AMSEL_R &= ~(1 << 4) | (1 << 5); 						// Disable analog function PE4-PE5   0011 0000
 }
+void uart5_send_byte(uint8_t c)
+{
+	while((UART5_FR_R & 0x20) != 0);  
+	UART5_DR_R = c; 					
+}
+
+
+
+void Uart5_output_string(char* pt){
+	while(*pt){
+		uart5_send_byte(*pt);
+		pt++;
+	}
+}
+
+
+
+void uart2_send_byte(uint8_t c)
+{
+	while((UART2_FR_R & 0x20) != 0);  
+	UART2_DR_R = c; 					
+}
+
+uint8_t uart2_read_byte(void)
+{
+	uint8_t c;
+	
+	while((UART2_FR_R & 0x10) != 0);  
+	c = UART2_DR_R; 					
+	
+	return c; 
+}
 
 
