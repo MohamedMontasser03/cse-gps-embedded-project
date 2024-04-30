@@ -8,9 +8,61 @@
 #define M_PI 3.14159265358979323846
 #define RADIUS 6371000 // radius of earth in meters
 
+double tot_distance=0;
+
+// points coordinates
+double lat1=0;
+double long1=0;
+extern float currentLat;
+extern float currentLong;
+
 double to_degree(float raw_degree);
 double to_radians(double degrees);
 double distance(double lat1, double lon1, double lat2, double lon2);
+
+
+int main(void){
+	
+	
+	SYSTICKTIMER_init();
+	portF_init();
+	Uart5_init();
+  	uart2_init();
+	
+
+	RGB_set(0x2);
+	delayMillis(3000);
+	RGB(0X00);
+	delayMillis(1000*20);
+	RGB(0x0E);
+	delayMillis(3000);
+	RGB(0X00);
+	
+	RGB(RED_LED);
+	
+	//get start point
+	GPS_read();
+	GPS_format();
+	lat1 = to_degree(currentLat);
+	long1 = to_degree(currentLong);
+
+		while(1){
+		GPS_read();
+		GPS_format();
+		
+		currentLat = to_degree(currentLat);
+		currentLong = to_degree(currentLong);
+			
+		tot_distance += distance(lat1, long1, currentLat, currentLong);
+			lat1 = currentLat;
+			long1 = currentLong;
+			
+			if(tot_distance >=5 || (GPIO_PORTF_DATA_R & SW1)==0){
+				RGB(GREEN_LED);
+				break;
+		}
+	}	
+}
 
 
 double to_degree(float raw_degree){  //gps output to degrees
