@@ -63,7 +63,7 @@ int main(void){
 			lat1 = currentLat;
 			long1 = currentLong;
 			
-			if(tot_distance >=5 || (GPIO_PORTF_DATA_R & SW1)==0){
+			if(tot_distance >=100 || (GPIO_PORTF_DATA_R & SW1)==0){
 				RGB(GREEN_LED);
 				break;
 		}
