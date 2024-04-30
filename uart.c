@@ -44,20 +44,3 @@ void Uart5_init(void){													// PE Rx -> 4 ; Tx -> 5
 }
 
 
-
-void uart5_send_byte(uint8_t c)
-{
-	while((UART5_FR_R & 0x20) != 0);  
-	UART5_DR_R = c; 					
-}
-
-
-
-void Uart5_output_string(char* pt){
-	while(*pt){
-		uart5_send_byte(*pt);
-		pt++;
-	}
-}
-
-
