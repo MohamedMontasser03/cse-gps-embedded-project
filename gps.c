@@ -35,3 +35,31 @@ void GPS_read(void){
 	  }while(GPS[counter-1]!= '*');
 }
 
+// extract Latitude  and Longitude of the $GPRMC message 
+void GPS_format(void){
+
+	char noofStrings = 0;
+	token = strtok (GPS ,",");
+
+	do{
+	strcpy (GPS_formated [noofStrings],token);
+	token = strtok (NULL ,",");
+	noofStrings++;
+	}while (token!=NULL);
+	
+
+		if(strcmp(GPS_formated[1], "A")==0) {
+
+				if (strcmp(GPS_formated [3], "N")==0)
+				currentLat = atof (GPS_formated [2]);
+				else
+				currentLat = -(atof (GPS_formated [2]));
+
+				if (strcmp(GPS_formated [5], "E")==0)
+				currentLong = atof (GPS_formated [4]);
+				else
+				currentLong = -(atof (GPS_formated [4]));
+
+				}
+
+}
