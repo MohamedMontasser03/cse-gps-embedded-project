@@ -47,7 +47,7 @@ GPIO_PORTA_AMSEL_R &= ~0x03;
 void uart0_send_byte(uint8_t c)
 {
 	while((UART0_FR_R & 0x20) != 0);  
-	UART5_DR_R = c; 					
+	UART0_DR_R = c; 					
 }
 
 
@@ -75,6 +75,19 @@ uint8_t uart2_read_byte(void)
 	c = UART2_DR_R; 					
 	
 	return c; 
+}
+
+
+void uart0_send_byte(char data){
+  while((UART0_FR_R & UART_FR_TXFF)==UART_FR_TXFF){};
+    UART0_DR_R = data;
+}
+
+void Uart0_output_string(char* pt){
+	while(*pt){
+		uart0_send_byte(*pt);
+		pt++;
+	}
 }
 void SYSTICKTIMER_init(void){
 	NVIC_ST_CTRL_R = 0;
