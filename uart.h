@@ -22,7 +22,4 @@ void SYSTICKTIMER_init(void);
 void SYSTICK_wait1ms(void);
 void delayMillis(uint32_t delay);
 
-
 #endif
-
-

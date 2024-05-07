@@ -3,5 +3,4 @@
 void GPS_read(void);
 void GPS_format(void);
 
-
-#endif 
+#endif
