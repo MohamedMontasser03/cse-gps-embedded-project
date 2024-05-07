@@ -2,8 +2,8 @@
 #define _TM4C_H
 #include "tm4c123gh6pm.h"
 #endif
-#ifndef _STDINT_H
-#define _STDINT_H
+#ifndef _STD_INT_H
+#define _STD_INT_H
 #include <stdint.h>
 #endif
 #ifndef _UART_H
