@@ -1,0 +1,147 @@
+---
+const locations = [
+  { lat: 30.1069592, lng: 31.3041486 },
+  { lat: 30.106894, lng: 31.304368 },
+  { lat: 30.106845, lng: 31.304505 },
+  { lat: 30.10504, lng: 31.305382 },
+];
+const mapsKey = import.meta.env.MAPS_KEY;
+---
+
+<html>
+  <head>
+    <title>Map Test</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"
+    ></script>
+
+    <link rel="stylesheet" type="text/css" href="./style.css" />
+    <script type="module" src="./index.js"></script>
+  </head>
+  <body>
+    <div id="map" data-locations={JSON.stringify(locations)} data-key={mapsKey}>
+    </div>
+
+    <script>
+      const mapElement = document.getElementById("map") as HTMLElement;
+      const locations = JSON.parse(mapElement.dataset.locations as string) as {
+        lat: number;
+        lng: number;
+      }[];
+
+      let map: google.maps.Map;
+      async function initMap(): Promise<void> {
+        const { Map } = (await google.maps.importLibrary(
+          "maps"
+        )) as google.maps.MapsLibrary;
+        const { AdvancedMarkerElement } = (await google.maps.importLibrary(
+          "marker"
+        )) as google.maps.MarkerLibrary;
+        const { LatLngBounds } = (await google.maps.importLibrary(
+          "core"
+        )) as google.maps.CoreLibrary;
+        const bounds = new LatLngBounds();
+        locations.forEach((location) => {
+          bounds.extend(location);
+        });
+        map = new Map(mapElement, {
+          center: locations[0],
+          zoom: 18,
+          mapId: "test",
+        });
+        map.fitBounds(bounds);
+
+        const createPathImage = () => {
+          const beachFlagImg = document.createElement("img");
+          beachFlagImg.src =
+            "https://maps.gstatic.com/mapfiles/place_api/icons/v2/generic_pinlet.svg";
+          beachFlagImg.style.width = "20px";
+          beachFlagImg.style.height = "20px";
+          beachFlagImg.style.filter =
+            "brightness(0.9) invert(.7) sepia(.5) hue-rotate(-180deg) saturate(200%)";
+          return beachFlagImg;
+        };
+        const createHomeImage = () => {
+          const beachFlagImg = document.createElement("img");
+          beachFlagImg.src =
+            "https://freepngimg.com/download/icon/map/66970-map-google-icons-house-maps-computer-marker.png";
+          beachFlagImg.style.width = "40px";
+          return beachFlagImg;
+        };
+        const createGoalImage = () => {
+          const beachFlagImg = document.createElement("img");
+          beachFlagImg.src =
+            "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
+          return beachFlagImg;
+        };
+
+        locations.forEach((location, index) => {
+          new AdvancedMarkerElement({
+            map,
+            position: location,
+            content:
+              index === locations.length - 1
+                ? createGoalImage()
+                : index === 0
+                  ? createHomeImage()
+                  : createPathImage(),
+            title: "Hello" + location.lat,
+          });
+        });
+      }
+
+      initMap();
+    </script>
+
+    <!-- prettier-ignore -->
+    <script is:inline>
+        const key = document.getElementById("map").dataset.key;
+      ((g) => {
+        var h,
+          a,
+          k,
+          p = "The Google Maps JavaScript API",
+          c = "google",
+          l = "importLibrary",
+          q = "__ib__",
+          m = document,
+          b = window;
+        b = b[c] || (b[c] = {});
+        var d = b.maps || (b.maps = {}),
+          r = new Set(),
+          e = new URLSearchParams(),
+          u = () =>
+            h ||
+            (h = new Promise(async (f, n) => {
+              await (a = m.createElement("script"));
+              e.set("libraries", [...r] + "");
+              for (k in g)
+                e.set(
+                  k.replace(/[A-Z]/g, (t) => "_" + t[0].toLowerCase()),
+                  g[k]
+                );
+              e.set("callback", c + ".maps." + q);
+              a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+              d[q] = f;
+              a.onerror = () => (h = n(Error(p + " could not load.")));
+              a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+              m.head.append(a);
+            }));
+        d[l]
+          ? console.warn(p + " only loads once. Ignoring:", g)
+          : (d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)));
+      })({ key, v: "weekly" });
+    </script>
+  </body>
+</html>
+
+<style>
+  #map {
+    height: 100%;
+  }
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+</style>
