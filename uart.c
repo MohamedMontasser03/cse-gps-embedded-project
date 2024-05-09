@@ -44,8 +44,7 @@ void uart0_init() {
 }
 
 void uart0_send_byte(uint8_t c) {
-    while ((UART0_FR_R & 0x20) != 0)
-        ;
+    while ((UART0_FR_R & 0x20) != 0);
     UART0_DR_R = c;
 }
 
@@ -57,33 +56,19 @@ void Uart0_output_string(char* pt) {
 }
 
 void uart2_send_byte(uint8_t c) {
-    while ((UART2_FR_R & 0x20) != 0)
-        ;
+    while ((UART2_FR_R & 0x20) != 0);
     UART2_DR_R = c;
 }
 
 uint8_t uart2_read_byte(void) {
     uint8_t c;
 
-    while ((UART2_FR_R & 0x10) != 0)
-        ;
+    while ((UART2_FR_R & 0x10) != 0) ;
     c = UART2_DR_R;
-
     return c;
 }
 
-void uart0_send_byte(char data) {
-    while ((UART0_FR_R & UART_FR_TXFF) == UART_FR_TXFF) {
-    };
-    UART0_DR_R = data;
-}
 
-void Uart0_output_string(char* pt) {
-    while (*pt) {
-        uart0_send_byte(*pt);
-        pt++;
-    }
-}
 void SYSTICKTIMER_init(void) {
     NVIC_ST_CTRL_R = 0;
     NVIC_ST_RELOAD_R = 0XFFFFFF;
