@@ -1,10 +1,50 @@
 ---
+import { SerialPort } from "serialport";
+
+const ports = await SerialPort.list();
+// read from the first element in the list
+const portInfo = ports[0];
+console.log(portInfo);
+const serialPort = new SerialPort({
+  baudRate: 9600,
+  path: "\\\\.\\" + portInfo.path,
+});
+let stringBuffer = "";
+let newLocation: null | {
+  lat: number;
+  lng?: number;
+} = null;
 const locations = [
   { lat: 30.1069592, lng: 31.3041486 },
   { lat: 30.106894, lng: 31.304368 },
   { lat: 30.106845, lng: 31.304505 },
   { lat: 30.10504, lng: 31.305382 },
 ];
+serialPort.on("data", (data) => {
+  // read the Buffer data
+  // console.log(data.toString());
+  // check if the final byte of the buffer is \0
+  if (data[data.length - 1] === 0) {
+    // if it is, then we have a complete message
+    console.log(stringBuffer);
+    if (newLocation === null) {
+      newLocation = {
+        lat: parseFloat(stringBuffer),
+      };
+    } else {
+      newLocation.lng = parseFloat(stringBuffer);
+      if (newLocation.lat && newLocation.lng)
+        locations.push(newLocation as { lat: number; lng: number });
+      newLocation = null;
+    }
+    // clear the buffer
+    stringBuffer = "";
+  } else {
+    // if not, then we append the data to the buffer
+    stringBuffer += data.toString();
+  }
+});
+
 const mapsKey = import.meta.env.MAPS_KEY;
 ---
 
@@ -94,7 +134,7 @@ const mapsKey = import.meta.env.MAPS_KEY;
 
     <!-- prettier-ignore -->
     <script is:inline>
-        const key = document.getElementById("map").dataset.key;
+      const key = document.getElementById("map").dataset.key;
       ((g) => {
         var h,
           a,
