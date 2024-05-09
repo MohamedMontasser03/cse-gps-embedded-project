@@ -28,6 +28,7 @@ int main(void) {
     SYSTICKTIMER_init();
     portF_init();
     uart2_init();
+	uart0_init();
 
     RGB_set(0x2);
     delayMillis(3000);
