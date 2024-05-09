@@ -27,7 +27,6 @@ void UART0SendFloat(float num);
 int main(void) {
     SYSTICKTIMER_init();
     portF_init();
-    Uart5_init();
     uart2_init();
 
     RGB_set(0x2);
