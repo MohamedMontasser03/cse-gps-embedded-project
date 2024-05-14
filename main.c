@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "flash.h"
 #include "gps.h"
 #include "lcd.h"
 #include "led.h"
@@ -18,6 +19,11 @@ double long1 = 0;
 extern float currentLat;
 extern float currentLong;
 
+// create a buffer to store points coordinates
+// with a size of 200 points so 2 * 200 * 4
+// this buffer is an array of 200 points each is an array of 2 elements
+float points[200][2];
+
 void portF_init(void);
 float to_degree(float raw_degree);
 double to_radians(double degrees);
@@ -26,8 +32,10 @@ double approximate(double a, float d);
 void UART0SendFloat(float num);
 
 int main(void) {
+    int current_point = 0;
     SYSTICKTIMER_init();
     portF_init();
+    Flash_Enable();
     uart2_init();
     uart0_init();
     LCD_init();
@@ -52,6 +60,9 @@ int main(void) {
     GPS_format();
     lat1 = to_degree(currentLat);
     long1 = to_degree(currentLong);
+    points[0][0] = lat1;
+    points[0][1] = long1;
+    current_point++;
 
     while (1) {
         LCD_clear();
@@ -69,9 +80,21 @@ int main(void) {
         tot_distance += distance(lat1, long1, currentLat, currentLong);
         lat1 = currentLat;
         long1 = currentLong;
+        points[current_point][0] = lat1;
+        points[current_point][1] = long1;
+        current_point++;
 
-        if (tot_distance >= 100 || (GPIO_PORTF_DATA_R & SW1) == 0) {
+        if (tot_distance >= 100 || (GPIO_PORTF_DATA_R & SW1) == 0 ||
+            current_point == 200) {
             RGB(GREEN_LED);
+            LCD_clear();
+            LCD_displayString("Total distance: ");
+            LCD_displayfloat(tot_distance);
+            LCD_sendCommand(LCD_SECOND_LINE);
+            LCD_displayString("Saving points to flash");
+            Flash_Erase(2);
+            Flash_Write(&current_point, 1, 0);
+            Flash_Write(points, current_point * 2, 1);
             break;
         }
         delayMillis(2000);
