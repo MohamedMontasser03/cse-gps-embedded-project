@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "gps.h"
+#include "lcd.h"
 #include "led.h"
 #include "uart.h"
 
@@ -18,7 +19,7 @@ extern float currentLat;
 extern float currentLong;
 
 void portF_init(void);
-double to_degree(float raw_degree);
+float to_degree(float raw_degree);
 double to_radians(double degrees);
 double distance(double lat1, double lon1, double lat2, double lon2);
 double approximate(double a, float d);
@@ -28,26 +29,38 @@ int main(void) {
     SYSTICKTIMER_init();
     portF_init();
     uart2_init();
-	uart0_init();
+    uart0_init();
+    LCD_init();
+    LCD_clear();
+    LCD_displayString("Starting the path tracking app");
 
-    RGB_set(0x2);
+    // some delays to make sure the gps module is ready
+    RGB_set(RED_LED);
     delayMillis(3000);
+    LCD_clear();
+    LCD_displayString("Initializing GPS module");
     RGB(0X00);
     delayMillis(1000 * 20);
     RGB(0x0E);
     delayMillis(3000);
-    RGB(0X00);
-
     RGB(RED_LED);
 
     // get start point
+    LCD_clear();
+    LCD_displayString("Getting start point");
     GPS_read();
     GPS_format();
     lat1 = to_degree(currentLat);
     long1 = to_degree(currentLong);
 
     while (1) {
-        GPS_read();
+        LCD_clear();
+        LCD_displayString("LAT: ");
+        LCD_displayfloat(currentLat);
+        LCD_sendCommand(LCD_SECOND_LINE);
+        LCD_displayString("LONG: ");
+        LCD_displayfloat(currentLong);
+
         GPS_format();
 
         currentLat = to_degree(currentLat);
@@ -70,7 +83,7 @@ void portF_init(void) {
     };
     GPIO_PORTF_LOCK_R = GPIO_LOCK_KEY;  // Unlock PortF PF0
     GPIO_PORTF_CR_R = 0x1F;             // Allow changes to PF1-3
-    GPIO_PORTF_DIR_R = 0x0E;            // PF3,PF2,PF1 output
+    GPIO_PORTF_DIR_R = RGB_LED;         // PF3,PF2,PF1 output
     GPIO_PORTF_AFSEL_R = 0x00;          // No alternate function
     GPIO_PORTF_PCTL_R = 0x00000000;     // GPIO clear bit PCTL
     GPIO_PORTF_DEN_R = 0x1F;            // Enable digital pins PF1-PF3
@@ -78,10 +91,10 @@ void portF_init(void) {
     GPIO_PORTF_PUR_R = 0x11;            // enable pull-up on PF0 and PF4
 }
 
-double to_degree(float raw_degree) {  // gps output to degrees
+float to_degree(float raw_degree) {  // gps output to degrees
     int dd = (int)(raw_degree / 100);
-    double mm = raw_degree - (dd * 100);
-    double degree = dd + (mm / 60);
+    float mm = raw_degree - (dd * 100);
+    float degree = dd + (mm / 60);
     return degree;
 }
 
@@ -108,8 +121,8 @@ void UART0SendFloat(float num) {
     snprintf(buffer, sizeof(buffer), "%f", num);
 
     for (i = 0; buffer[i] != '\0'; i++) {
-        while ((UART0_FR_R & UART_FR_TXFF) == UART_FR_TXFF)
-            ;                    // Wait until the transmitter is not full
+        while ((UART0_FR_R & UART_FR_TXFF) ==
+               UART_FR_TXFF);    // Wait until the transmitter is not full
         UART0_DR_R = buffer[i];  // Transmit the character
     }
 }

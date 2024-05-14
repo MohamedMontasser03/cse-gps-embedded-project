@@ -11,3 +11,4 @@ GPS-tracker.build_log.*
 *.lnp
 *.map
 *.lst
+*.iex
