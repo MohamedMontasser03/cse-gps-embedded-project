@@ -74,6 +74,7 @@ int main(void) {
             RGB(GREEN_LED);
             break;
         }
+        delayMillis(2000);
     }
 }
 

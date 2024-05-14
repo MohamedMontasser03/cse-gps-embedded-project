@@ -84,8 +84,6 @@ void LCD_displayfloat(float data) {
     char str[7];
     int i = 0;
     sprintf(str, "%f", data);  // used to convert flaot to string
-    LCD_sendCommand(1);        /* clear display */
-    LCD_sendCommand(0x80);     /* LCD cursor location */
 
     while (str[i] != '\0') {
         LCD_displayCharacter(str[i]);
