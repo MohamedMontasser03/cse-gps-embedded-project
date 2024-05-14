@@ -3,8 +3,8 @@
 #include "tm4c123gh6pm.h"
 #endif
 
-#ifndef _STDIO_H
-#define _STDIO_H
+#ifndef _STD_IO_H
+#define _STD_IO_H
 #include <stdio.h>
 #endif
 

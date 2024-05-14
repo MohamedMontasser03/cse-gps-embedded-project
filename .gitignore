@@ -1,2 +1,13 @@
 .vscode
 GPS-tracker.build_log.*
+*.bak
+
+*.o
+*.crf
+*.d
+*.axf
+*.dep
+*.htm
+*.lnp
+*.map
+*.lst

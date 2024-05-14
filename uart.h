@@ -14,9 +14,8 @@ void uart2_init();
 void uart2_send_byte(uint8_t c);
 
 uint8_t uart2_read_byte(void);
-void Uart0_init(void);
+void uart0_init(void);
 void uart0_send_byte(uint8_t c);
-void Uart0_output_string(char* pt);
 
 void SYSTICKTIMER_init(void);
 void SYSTICK_wait1ms(void);
