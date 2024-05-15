@@ -1,8 +1,10 @@
 #include "uart.h"
 
-void uart2_init() {  // for gps
-    unsigned BRD;
+#include <stdlib.h>
 
+#include "led.h"
+
+void uart2_init() {  // for gps
     SYSCTL_RCGCUART_R |= 0X04;  // activate UART2
     SYSCTL_RCGCGPIO_R |= 0X08;  //  activate port D
 
@@ -87,5 +89,43 @@ void delayMillis(uint32_t delay) {
     unsigned long i;
     for (i = 0; i < delay; i++) {
         SYSTICK_wait1ms();
+    }
+}
+
+void portF_init(void) {
+    SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R5;  // Enable port F clock
+    while ((SYSCTL_PRGPIO_R & SYSCTL_PRGPIO_R5) == 0) {
+    };
+    GPIO_PORTF_LOCK_R = GPIO_LOCK_KEY;  // Unlock PortF PF0
+    GPIO_PORTF_CR_R = 0x1F;             // Allow changes to PF1-3
+    GPIO_PORTF_DIR_R = RGB_LED;         // PF3,PF2,PF1 output
+    GPIO_PORTF_AFSEL_R = 0x00;          // No alternate function
+    GPIO_PORTF_PCTL_R = 0x00000000;     // GPIO clear bit PCTL
+    GPIO_PORTF_DEN_R = 0x1F;            // Enable digital pins PF1-PF3
+    GPIO_PORTF_AMSEL_R = 0x00;          // Disable analog function
+    GPIO_PORTF_PUR_R = 0x11;            // enable pull-up on PF0 and PF4
+}
+
+void UART0SendFloat(float num) {
+    int i;
+    char buffer[50];
+    snprintf(buffer, sizeof(buffer), "%f", num);
+
+    for (i = 0; i == 0 || buffer[i - 1] != '\0'; i++) {
+        while ((UART0_FR_R & UART_FR_TXFF) ==
+               UART_FR_TXFF);    // Wait until the transmitter is not full
+        UART0_DR_R = buffer[i];  // Transmit the character
+    }
+}
+
+void UART0SendInt(int num) {
+    int i;
+    char buffer[50];
+    snprintf(buffer, sizeof(buffer), "%d", num);
+
+    for (i = 0; i == 0 || buffer[i - 1] != '\0'; i++) {
+        while ((UART0_FR_R & UART_FR_TXFF) ==
+               UART_FR_TXFF);    // Wait until the transmitter is not full
+        UART0_DR_R = buffer[i];  // Transmit the character
     }
 }

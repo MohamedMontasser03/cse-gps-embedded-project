@@ -9,7 +9,7 @@
 #ifndef _UART_H
 #define _UART_H
 
-void uart2_init();
+void uart2_init(void);
 
 void uart2_send_byte(uint8_t c);
 
@@ -21,5 +21,8 @@ uint8_t uart0_read_byte(void);
 void SYSTICKTIMER_init(void);
 void SYSTICK_wait1ms(void);
 void delayMillis(uint32_t delay);
+void portF_init(void);
+void UART0SendFloat(float num);
+void UART0SendInt(int num);
 
 #endif
