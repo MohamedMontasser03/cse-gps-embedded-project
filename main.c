@@ -44,16 +44,16 @@ int main(void) {
     LCD_clear();
     LCD_displayString("Initializing GPS module");
     RGB(0X00);
-    // delayMillis(1000 * 20);
+    delayMillis(1000 * 20);
     RGB(0x0E);
-    // delayMillis(3000);
+    delayMillis(3000);
     RGB(RED_LED);
 
     // get start point
     LCD_clear();
     LCD_displayString("Getting start point");
-    // GPS_read();
-    // GPS_format();
+    GPS_read();
+    GPS_format();
     lat1 = to_degree(currentLat);
     long1 = to_degree(currentLong);
     points[0][0] = lat1;
@@ -68,7 +68,7 @@ int main(void) {
         LCD_displayString("LONG: ");
         LCD_displayfloat(currentLong);
 
-        // GPS_format();
+        GPS_format();
 
         currentLat = to_degree(currentLat);
         currentLong = to_degree(currentLong);
