@@ -53,6 +53,14 @@ void uart2_send_byte(uint8_t c) {
     UART2_DR_R = c;
 }
 
+uint8_t uart0_read_byte(void) {
+    uint8_t c;
+
+    while ((UART0_FR_R & 0x10) != 0);
+    c = UART0_DR_R;
+    return c;
+}
+
 uint8_t uart2_read_byte(void) {
     uint8_t c;
 

@@ -23,6 +23,7 @@ extern float currentLong;
 // with a size of 200 points so 2 * 200 * 4
 // this buffer is an array of 200 points each is an array of 2 elements
 float points[200][2];
+int current_point = 0;
 
 void portF_init(void);
 float to_degree(float raw_degree);
@@ -30,9 +31,10 @@ double to_radians(double degrees);
 double distance(double lat1, double lon1, double lat2, double lon2);
 double approximate(double a, float d);
 void UART0SendFloat(float num);
+void UART0SendInt(int num);
+void savedDataProcedure(void);
 
 int main(void) {
-    int current_point = 0;
     SYSTICKTIMER_init();
     portF_init();
     Flash_Enable();
@@ -41,6 +43,14 @@ int main(void) {
     LCD_init();
     LCD_clear();
     LCD_displayString("Starting the path tracking app");
+
+    Flash_Read(&current_point, 1, 0);
+    if (current_point < 200 && current_point > 0) {
+        LCD_clear();
+        LCD_displayString("Reading points from flash");
+        Flash_Read(points, current_point * 2, 1);
+        savedDataProcedure();
+    }
 
     // some delays to make sure the gps module is ready
     RGB_set(RED_LED);
@@ -89,15 +99,57 @@ int main(void) {
             RGB(GREEN_LED);
             LCD_clear();
             LCD_displayString("Total distance: ");
-            LCD_displayfloat(tot_distance);
             LCD_sendCommand(LCD_SECOND_LINE);
+            LCD_displayfloat(tot_distance);
+            LCD_displayString(" m");
+            LCD_clear();
             LCD_displayString("Saving points to flash");
             Flash_Erase(2);
             Flash_Write(&current_point, 1, 0);
             Flash_Write(points, current_point * 2, 1);
+            LCD_clear();
+            LCD_displayString("Points saved to flash");
             break;
         }
         delayMillis(2000);
+    }
+
+    savedDataProcedure();
+
+    LCD_clear();
+    // end program
+    LCD_displayString("Thank you for using our app");
+    while (1) {
+    }
+}
+
+void savedDataProcedure(void) {
+    int i;
+    while (1) {
+        LCD_clear();
+        LCD_displayString("Waiting for signal to send data");
+        LCD_clear();
+        LCD_displayString("Press SW1 to abort");
+
+        // if we recieve "u" from uart0 we will send the data
+        if (uart0_read_byte() == 'u') {
+            LCD_clear();
+            LCD_displayString("Sending data");
+            // send number of points
+            UART0SendInt(current_point);
+            for (i = 0; i < current_point; i++) {
+                UART0SendFloat(points[i][0]);
+                UART0SendFloat(points[i][1]);
+            }
+            break;
+        }
+
+        if ((GPIO_PORTF_DATA_R & SW1) == 0) {
+            LCD_clear();
+            LCD_displayString("Aborted, Clearing data");
+            Flash_Erase(2);
+            break;
+        }
     }
 }
 
@@ -144,7 +196,19 @@ void UART0SendFloat(float num) {
     char buffer[50];
     snprintf(buffer, sizeof(buffer), "%f", num);
 
-    for (i = 0; buffer[i] != '\0'; i++) {
+    for (i = 0; i == 0 || buffer[i - 1] != '\0'; i++) {
+        while ((UART0_FR_R & UART_FR_TXFF) ==
+               UART_FR_TXFF);    // Wait until the transmitter is not full
+        UART0_DR_R = buffer[i];  // Transmit the character
+    }
+}
+
+void UART0SendInt(int num) {
+    int i;
+    char buffer[50];
+    snprintf(buffer, sizeof(buffer), "%d", num);
+
+    for (i = 0; i == 0 || buffer[i - 1] != '\0'; i++) {
         while ((UART0_FR_R & UART_FR_TXFF) ==
                UART_FR_TXFF);    // Wait until the transmitter is not full
         UART0_DR_R = buffer[i];  // Transmit the character
