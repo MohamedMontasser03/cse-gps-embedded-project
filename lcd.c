@@ -45,3 +45,31 @@ void LCD_init(void) {
     LCD_sendCommand(0x02);
 }
 
+void LCD_displayCharacter(uint8_t data) {
+    GPIO_PORTB_DATA_R |=
+        0x01; /* Instruction Mode RS=1 /write data to LCD so RW=0/ENABLE=0 */
+    GPIO_PORTB_DATA_R = (GPIO_PORTB_DATA_R & 0x0F) | (data & 0xF0);
+    GPIO_PORTB_DATA_R |= 0X04; /*enable=1*/
+    delayMillis(40);
+    GPIO_PORTB_DATA_R &= 0xFB; /*enable =0*/
+    GPIO_PORTB_DATA_R =
+        ((GPIO_PORTB_DATA_R & 0x0F) | ((data << 4) & 0xF0)); /*write data*/
+    GPIO_PORTB_DATA_R |= 0X04;                               /*enable=1*/
+    delayMillis(40);
+    GPIO_PORTB_DATA_R &= 0xFB; /*enable =0*/
+    delayMillis(40);
+}
+
+void LCD_displayString(const char* Str) {
+    uint8_t i = 0;
+    while (Str[i] != '\0') {
+        if (i == 16) {
+            LCD_sendCommand(0xC0);
+        } else if (i == 32) {
+            LCD_sendCommand(0x01);
+            LCD_sendCommand(0x80);
+        }
+        LCD_displayCharacter(Str[i]);
+        i++;
+    }
+}
