@@ -79,17 +79,48 @@ int main(void) {
         GPS_read();
         GPS_format();
 
-        currentLat = to_degree(currentLat);
-        currentLong = to_degree(currentLong);
-
+    	currentLat =(int)((to_degree(currentLat)) *100000);
+	currentLat= (float) currentLat/ 100000;
+        currentLat =(int)((to_degree(currentLong)) *100000);
+	currentLat= (float) currentLong/ 100000;
+	    
+	LCD_clear();
+        LCD_displayString("distance: ");
+        LCD_displayfloat(tot_distance);
+	    
         tot_distance += distance(lat1, long1, currentLat, currentLong);
         lat1 = currentLat;
         long1 = currentLong;
 
-        if (tot_distance >= 100 || (GPIO_PORTF_DATA_R & SW1) == 0) {
+	points[current_point][0] = lat1;
+        points[current_point][1] = long1;
+        current_point++;
+
+        if (tot_distance >= 100 || (GPIO_PORTF_DATA_R & SW1) == 0 ||
+            current_point == 200) {
             RGB(GREEN_LED);
+            LCD_clear();
+            LCD_displayString("Total distance: ");
+            LCD_sendCommand(LCD_SECOND_LINE);
+            LCD_displayfloat(tot_distance);
+            LCD_displayString(" m");
+	    delayMillis(2000);
+            LCD_clear();
+            LCD_displayString("Saving points to flash");
+            Flash_Erase(2);
+            Flash_Write(&current_point, 1, 0);
+            Flash_Write(points, current_point * 2, 1);
+            LCD_clear();
+            LCD_displayString("Points saved to flash");
             break;
         }
+    }
+    savedDataProcedure();
+
+    LCD_clear();
+    // end program
+    LCD_displayString("Thank you for using our app");
+    while (1) {
     }
 }
 
