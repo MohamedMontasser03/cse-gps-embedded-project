@@ -19,6 +19,14 @@ extern float currentLong;
 
 void portF_init(void);
 
+// create a buffer to store points coordinates
+// with a size of 200 points so 2 * 200 * 4
+// this buffer is an array of 200 points each is an array of 2 elements
+float points[200][2];
+int current_point = 0;
+
+void savedDataProcedure(void);
+
 int main(void) {
     SYSTICKTIMER_init();
     portF_init();
@@ -54,6 +62,36 @@ int main(void) {
 
         if (tot_distance >= 100 || (GPIO_PORTF_DATA_R & SW1) == 0) {
             RGB(GREEN_LED);
+            break;
+        }
+    }
+}
+
+void savedDataProcedure(void) {
+    int i;
+    while (1) {
+        LCD_clear();
+        LCD_displayString("Waiting for signal to send data");
+        LCD_clear();
+        LCD_displayString("Press SW1 to abort");
+
+        // if we recieve "u" from uart0 we will send the data
+        if ((UART0_FR_R & 0x10) == 0 && uart0_read_byte() == 'u') {
+            LCD_clear();
+            LCD_displayString("Sending data");
+            // send number of points
+            UART0SendInt(current_point);
+            for (i = 0; i < current_point; i++) {
+                UART0SendFloat(points[i][0]);
+                UART0SendFloat(points[i][1]);
+            }
+            break;
+        }
+
+        if ((GPIO_PORTF_DATA_R & SW1) == 0) {
+            LCD_clear();
+            LCD_displayString("Aborted, Clearing data");
+            Flash_Erase(2);
             break;
         }
     }
