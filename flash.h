@@ -12,5 +12,6 @@
 
 void Flash_Enable(void);
 void Flash_Read(void* data, int wordCount, uint32_t offset);
+int Flash_Erase(int blockCount);
 #endif
 
