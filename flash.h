@@ -1,20 +1,16 @@
-#include "flash.h"
+#ifndef _TM4C_H
+#define _TM4C_H
+#include "tm4c123gh6pm.h"
+#endif
+#ifndef _STD_INT_H
+#define _STD_INT_H
+#include <stdint.h>
+#endif
+#ifndef _FLASH_H
+#define _FLASH_H
+#define FLASH_BASE_ADDR ((volatile uint32_t*)0x00020000)
 
-static uint16_t flashKey_ = 0;
-void Flash_Enable(void) {
-    // If the KEY flag (bit 4) is set, then the key is 0xA442.
-    //	Otherwise, the key is 0x71D5 (pg. 583 of the TM4C123 datasheet).
-    if (FLASH_BOOTCFG_R & 0x10) {
-        flashKey_ = 0xA442;
-    } else {
-        flashKey_ = 0x71D5;
-    }
-}
+void Flash_Enable(void);
+void Flash_Read(void* data, int wordCount, uint32_t offset);
+#endif
 
-void Flash_Read(void* data, int wordCount, uint32_t offset) {
-    int i;
-    // Copy the count of bytes into the target data buffer...
-    for (i = 0; i < wordCount; i++) {
-        ((uint32_t*)data)[i] = FLASH_BASE_ADDR[i + offset];
-    }
-}
