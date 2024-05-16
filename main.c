@@ -5,6 +5,8 @@
 #include "gps.h"
 #include "led.h"
 #include "uart.h"
+#include "lcd.h"
+#include "flash.h"
 
 
 double tot_distance = 0;
