@@ -73,3 +73,20 @@ void LCD_displayString(const char* Str) {
         i++;
     }
 }
+
+void LCD_clear(void) {
+    LCD_sendCommand(0x01);
+    delayMillis(2);
+}
+
+void LCD_displayfloat(float data) {
+    char str[7];
+    int i = 0;
+    sprintf(str, "%f", data);  // used to convert flaot to string
+
+    while (str[i] != '\0') {
+        LCD_displayCharacter(str[i]);
+        i++;
+    }
+    delayMillis(500);  // delay 500ms
+}
