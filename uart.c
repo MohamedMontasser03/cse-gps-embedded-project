@@ -48,6 +48,14 @@ void uart0_send_byte(uint8_t c) {
     UART0_DR_R = c;
 }
 
+uint8_t uart0_read_byte(void) {
+    uint8_t c;
+
+    while ((UART0_FR_R & 0x10) != 0);
+    c = UART0_DR_R;
+    return c;
+}
+
 void Uart0_output_string(char* pt) {
     while (*pt) {
         uart0_send_byte(*pt);
