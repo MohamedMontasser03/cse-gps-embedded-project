@@ -80,14 +80,4 @@ void portF_init(void) {
 
 
 
-void UART0SendFloat(float num) {
-    int i;
-    char buffer[50];
-    snprintf(buffer, sizeof(buffer), "%f", num);
 
-    for (i = 0; buffer[i] != '\0'; i++) {
-        while ((UART0_FR_R & UART_FR_TXFF) == UART_FR_TXFF)
-            ;                    // Wait until the transmitter is not full
-        UART0_DR_R = buffer[i];  // Transmit the character
-    }
-}
