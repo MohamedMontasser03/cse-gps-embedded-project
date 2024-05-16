@@ -25,10 +25,13 @@ int main(void) {
     portF_init();
     Flash_Enable();
     uart2_init();
+<<<<<<< HEAD
     uart0_init();
     LCD_init();
     LCD_clear();
     LCD_displayString("Starting the path tracking app");
+=======
+>>>>>>> parent of 6824379 (Update main.c)
 
     Flash_Read(&current_point, 1, 0);
     if (current_point < 200 && current_point > 0) {
