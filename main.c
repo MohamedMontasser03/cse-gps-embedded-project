@@ -35,6 +35,7 @@ void savedDataProcedure(void);
 int main(void) {
     SYSTICKTIMER_init();
     portF_init();
+    Flash_Enable();
     uart2_init();
     uart0_init();
     LCD_init();
