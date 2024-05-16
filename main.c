@@ -6,8 +6,6 @@
 #include "led.h"
 #include "uart.h"
 
-#define M_PI 3.14159265358979323846
-#define RADIUS 6371000  // radius of earth in meters
 
 double tot_distance = 0;
 
@@ -49,6 +47,9 @@ int main(void) {
         savedDataProcedure();
     }
 
+    LCD_clear();
+    LCD_displayString("Initializing GPS module");
+	
     RGB_set(0x2);
     delayMillis(3000);
     RGB(0X00);
@@ -58,12 +59,21 @@ int main(void) {
     RGB(0X00);
 
     RGB(RED_LED);
+// get start point
+    LCD_clear();
+    LCD_displayString("Getting start point");
 
-    // get start point
-    GPS_read();
-    GPS_format();
-    lat1 = to_degree(currentLat);
-    long1 = to_degree(currentLong);
+    while(lat1 == 0 || long1 == 0) {
+    	GPS_read();
+	GPS_format();
+	lat1 =(int) (to_degree(currentLat) * 100000);
+	lat1=(float) lat1/ 100000;
+	long1 =(int) (to_degree(currentLong) * 100000);
+	long1=(float) long1/ 100000;
+    }
+    points[0][0] = lat1;
+    points[0][1] = long1;
+    current_point++;
 
     while (1) {
         GPS_read();
