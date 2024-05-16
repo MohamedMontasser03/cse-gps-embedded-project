@@ -18,11 +18,6 @@ extern float currentLat;
 extern float currentLong;
 
 void portF_init(void);
-double to_degree(float raw_degree);
-double to_radians(double degrees);
-double distance(double lat1, double lon1, double lat2, double lon2);
-double approximate(double a, float d);
-void UART0SendFloat(float num);
 
 int main(void) {
     SYSTICKTIMER_init();
