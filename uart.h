@@ -21,5 +21,7 @@ void Uart0_output_string(char* pt);
 void SYSTICKTIMER_init(void);
 void SYSTICK_wait1ms(void);
 void delayMillis(uint32_t delay);
+void UART0SendFloat(float num);
+void UART0SendInt(int num);
 
 #endif
