@@ -16,6 +16,11 @@ double lat1 = 0;
 double long1 = 0;
 extern float currentLat;
 extern float currentLong;
+// create a buffer to store points coordinates
+// with a size of 200 points so 2 * 200 * 4
+// this buffer is an array of 200 points each is an array of 2 elements
+float points[200][2];
+int current_point = 0;
 
 void portF_init(void);
 
@@ -31,7 +36,18 @@ int main(void) {
     SYSTICKTIMER_init();
     portF_init();
     uart2_init();
-	uart0_init();
+    uart0_init();
+    LCD_init();
+    LCD_clear();
+    LCD_displayString("Starting the path tracking app");
+	
+    Flash_Read(&current_point, 1, 0);
+    if (current_point < 200 && current_point > 0) {
+        LCD_clear();
+        LCD_displayString("Reading points from flash");
+        Flash_Read(points, current_point * 2, 1);
+        savedDataProcedure();
+    }
 
     RGB_set(0x2);
     delayMillis(3000);
