@@ -55,6 +55,30 @@ void Uart0_output_string(char* pt) {
     }
 }
 
+void UART0SendFloat(float num) {
+    int i;
+    char buffer[50];
+    snprintf(buffer, sizeof(buffer), "%f", num);
+
+    for (i = 0; buffer[i] != '\0'; i++) {
+        while ((UART0_FR_R & UART_FR_TXFF) == UART_FR_TXFF)
+            ;                    // Wait until the transmitter is not full
+        UART0_DR_R = buffer[i];  // Transmit the character
+    }
+}
+
+void UART0SendInt(int num) {
+    int i;
+    char buffer[50];
+    snprintf(buffer, sizeof(buffer), "%d", num);
+
+    for (i = 0; i == 0 || buffer[i - 1] != '\0'; i++) {
+        while ((UART0_FR_R & UART_FR_TXFF) ==
+               UART_FR_TXFF);    // Wait until the transmitter is not full
+        UART0_DR_R = buffer[i];  // Transmit the character
+    }
+}
+
 void uart2_send_byte(uint8_t c) {
     while ((UART2_FR_R & 0x20) != 0);
     UART2_DR_R = c;
