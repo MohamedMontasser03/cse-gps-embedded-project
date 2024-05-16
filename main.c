@@ -23,13 +23,6 @@ float points[200][2];
 int current_point = 0;
 
 void portF_init(void);
-
-// create a buffer to store points coordinates
-// with a size of 200 points so 2 * 200 * 4
-// this buffer is an array of 200 points each is an array of 2 elements
-float points[200][2];
-int current_point = 0;
-
 void savedDataProcedure(void);
 
 int main(void) {
