@@ -109,7 +109,7 @@ void SYSTICKTIMER_init(void) {
 }
 
 void SYSTICK_wait1ms(void) {
-    NVIC_ST_RELOAD_R = 16000;
+    NVIC_ST_RELOAD_R = 15999;
     NVIC_ST_CURRENT_R = 0;
     while ((NVIC_ST_CTRL_R & 0x10000) == 0) {
     };  // wait for the flag
